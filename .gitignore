@@ -1,0 +1,9 @@
+*.exe
+*.o
+*.obj
+*.zpj.bak
+*.zpr.bak
+.zinjal/
+Debug/
+DebugPortable/
+build/
