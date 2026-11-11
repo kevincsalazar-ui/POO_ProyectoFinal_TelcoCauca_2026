@@ -99,7 +99,7 @@ int menu() {
                      "4. Concurrencia y eventos 2027\n"
                      "5. Comunicacion TCP/UDP\n"
                      "6. Demostracion completa\n"
-                     "7. Servidor y clientes en procesos independientes (Windows)\n"
+                     "7. Servidor y clientes en procesos independientes\n"
                      "0. Salir\n"
                      "Opcion: " << std::flush;
         if (!std::getline(std::cin, opcion) || opcion == "0") return 0;
