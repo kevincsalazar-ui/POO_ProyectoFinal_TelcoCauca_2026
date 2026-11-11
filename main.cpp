@@ -1,147 +1,163 @@
-#include "Antena.h"
-#include "Torre.h"
-#include "NodoRedInteligente.h"
-#include "Red.h"
-#include "GrupoHilos.h"
-#include <functional>
+// TelcoCauca - Sistema distribuido concurrente de monitoreo de infraestructura de telecomunicaciones e IoT.
+// Universidad del Cauca - Programacion Orientada a Objetos - C++11.
+#include "Clientes.h"
+#include "Demo.h"
+#include "Registro.h"
+#include "ServidorCentral.h"
+#include "Socket.h"
+#include "Util.h"
+#include <chrono>
+#include <limits>
+#include <stdexcept>
+#include <exception>
 #include <iostream>
-#include <memory>
+#include <string>
+#include <thread>
+
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
 namespace {
-void infraestructura() {
-    Tecnico ana(1, "Ana", "Radiofrecuencia");
-    Tecnico luis(2, "Luis", "Redes moviles");
-    Antena a(101, 1800, "4G", &ana);
-    Antena b(102, 3500, "5G", &luis);
-    Torre torre(1, "Popayan", 35);
-    torre.agregarAntena(&a);
-    torre.agregarAntena(&b);
-    torre.mostrarInformacion();
+
+void mostrarAyuda() {
+    std::cout << "Uso:\n"
+                 "  TelcoCauca                        menu interactivo\n"
+                 "  TelcoCauca --pruebas              demostracion completa con verificacion (codigo de salida 0 = todo OK)\n"
+                 "  TelcoCauca --servidor [puerto] [segundos]   servidor TCP+UDP (0 s = hasta ENTER). Por defecto 5000\n"
+                 "  TelcoCauca --router|--gateway|--sensor [ip] [puerto]   cliente en proceso independiente\n"
+                 "  Agregue --sinpausa para no esperar ENTER al terminar un modo de proceso.\n";
 }
 
-void nodos() {
-    NodoRedInteligente a("127.0.0.1", "02:00:00:00:00:01", true, "Temperatura", 24.5, 7);
-    const NodoRedInteligente b("127.0.0.2", "02:00:00:00:00:02", true, "Temperatura", 26, 5);
-    std::cout << "Nodo: " << a << "\nCarga total: " << a + b << '\n';
-    try {
-        a.setValorLectura(120);
-        throw std::logic_error("Falto validar la lectura");
-    } catch (const ExcepcionNodoRed& e) {
-        std::cout << "Lectura rechazada: " << e.what() << '\n';
-    }
-    try {
-        NodoRedInteligente invalido("300.0.0.1", "02:00:00:00:00:03", false, "Temperatura", 20, 2);
-        throw std::logic_error("Falto validar la IP");
-    } catch (const ExcepcionNodoRed& e) {
-        std::cout << "IP rechazada: " << e.what() << '\n';
-    }
+void esperarEnter() {
+    std::cout << "Presione ENTER para cerrar..." << std::endl;
+    std::string linea;
+    std::getline(std::cin, linea);
 }
 
-class Supervisor {
-public:
-    void supervisar(DispositivoComunicacion* dispositivo, Registro& registro) const {
-        tareaTransmisionHilo(dispositivo, registro);
-    }
-};
-
-void concurrencia() {
+int modoServidor(std::uint16_t puerto, int segundos, bool pausa) {
     Registro registro;
-    std::vector<std::unique_ptr<DispositivoComunicacion>> propietarios;
-    propietarios.reserve(3);
-    propietarios.emplace_back(new RouterWiFi("RTR-01", 12));
-    propietarios.emplace_back(new GatewayLoRa("GW-01", 868.1f));
-    propietarios.emplace_back(new SwitchFibra("SW-01", 8));
-    std::vector<DispositivoComunicacion*> red;
-    for (const auto& dispositivo : propietarios) red.push_back(dispositivo.get());
-    red.push_back(nullptr);
-
-    const Supervisor supervisor;
-    GrupoHilos hilos(red.size() + 1);
-    for (auto* dispositivo : red)
-        hilos.agregar(&Supervisor::supervisar, &supervisor, dispositivo, std::ref(registro));
-    hilos.agregar(tareaEventos2027, std::ref(registro));
-    hilos.esperar();
-    if (registro.exitosas != 3 || registro.errores != 1 || registro.eventos.size() < 3)
-        throw std::runtime_error("Resultado inesperado de concurrencia");
-    std::cout << "Resumen: " << registro.exitosas << " transmisiones, "
-              << registro.errores << " excepcion controlada y "
-              << registro.eventos.size() << " eventos de 2027.\n";
+    ServidorCentral servidor(registro, 5000);
+    servidor.iniciar("127.0.0.1", puerto, puerto);  // TCP y UDP usan espacios de puertos distintos
+    registro.imprimir("Servidor listo en 127.0.0.1: TCP " + aTexto(puerto) + " / UDP " + aTexto(puerto));
+    if (segundos > 0) {
+        std::this_thread::sleep_for(std::chrono::seconds(segundos));
+    } else {
+        registro.imprimir("Presione ENTER para detener el servidor...");
+        std::string linea;
+        std::getline(std::cin, linea);
+    }
+    servidor.detener();
+    std::cout << "Servidor detenido. TCP aceptadas=" << servidor.tramasTcpAceptadas()
+              << " UDP aceptadas=" << servidor.tramasUdpAceptadas() << " rechazadas=" << servidor.tramasRechazadas()
+              << " errores=" << registro.errores() << std::endl;
+    if (pausa && segundos > 0) esperarEnter();
+    return registro.errores() == 0 ? 0 : 1;
 }
 
-unsigned short puertoDe(const std::string& texto) {
-    std::size_t fin = 0;
-    const int puerto = std::stoi(texto, &fin);
-    if (fin != texto.size() || puerto <= 0 || puerto > 65535)
-        throw std::invalid_argument("Puerto invalido");
-    return static_cast<unsigned short>(puerto);
+// Opcion 7: abre servidor y tres clientes en consolas separadas (solo Windows).
+void lanzarProcesos() {
+#ifdef _WIN32
+    char ruta[MAX_PATH];
+    const DWORD longitud = GetModuleFileNameA(NULL, ruta, MAX_PATH);
+    if (longitud == 0 || longitud >= MAX_PATH) {
+        std::cout << "No se pudo obtener una ruta completa del ejecutable (limite MAX_PATH)." << std::endl;
+        return;
+    }
+    const std::string exe = ruta;
+    const char* modos[] = {"--servidor 5000", "--router 127.0.0.1 5000", "--gateway 127.0.0.1 5000", "--sensor 127.0.0.1 5000"};
+    for (int i = 0; i < 4; ++i) {
+        std::string comando = "\"" + exe + "\" " + modos[i];
+        STARTUPINFOA si;
+        PROCESS_INFORMATION pi;
+        ZeroMemory(&si, sizeof(si));
+        si.cb = sizeof(si);
+        ZeroMemory(&pi, sizeof(pi));
+        if (!CreateProcessA(exe.c_str(), &comando[0], NULL, NULL, FALSE, CREATE_NEW_CONSOLE, NULL, NULL, &si, &pi)) {
+            std::cout << "No se pudo lanzar: " << comando << " (codigo " << GetLastError()
+                      << "). Revise y cierre las consolas ya abiertas." << std::endl;
+            return;
+        }
+        CloseHandle(pi.hProcess);
+        CloseHandle(pi.hThread);
+        if (i == 0) std::this_thread::sleep_for(std::chrono::milliseconds(1200));  // espera orientativa: NO confirma que el servidor este listo
+    }
+    std::cout << "Se lanzaron 4 procesos; compruebe ACK y errores en cada consola. Cierre el servidor con ENTER." << std::endl;
+#else
+    std::cout << "Esta opcion abre ventanas de Windows. En Linux ejecute cada modo en una terminal distinta:\n"
+                 "  ./TelcoCauca --servidor 5000   y luego   ./TelcoCauca --router 127.0.0.1 5000  (etc.)" << std::endl;
+#endif
 }
 
-void redLocal() {
-    Registro registro;
-    demostrarRed(registro);
-}
-
-void demostracion() {
-    infraestructura();
-    nodos();
-    concurrencia();
-    redLocal();
-}
-
-void menu() {
+int menu() {
     std::string opcion;
-    while (true) {
-        std::cout << "\nTELCOCAUCA\n1 Infraestructura\n2 Nodos y excepciones\n"
-                     "3 Dispositivos, hilos y agenda\n4 Red TCP y UDP\n5 Demostracion completa\n0 Salir\n> ";
-        if (!std::getline(std::cin, opcion) || opcion == "0") return;
+    for (;;) {
+        std::cout << "\n========== TELCOCAUCA ==========\n"
+                     "1. Infraestructura fisica\n"
+                     "2. Herencia multiple y excepciones\n"
+                     "3. Polimorfismo e interfaces\n"
+                     "4. Concurrencia y eventos 2027\n"
+                     "5. Comunicacion TCP/UDP\n"
+                     "6. Demostracion completa\n"
+                     "7. Servidor y clientes en procesos independientes (Windows)\n"
+                     "0. Salir\n"
+                     "Opcion: " << std::flush;
+        if (!std::getline(std::cin, opcion) || opcion == "0") return 0;
         try {
-            if (opcion == "1") infraestructura();
-            else if (opcion == "2") nodos();
-            else if (opcion == "3") concurrencia();
-            else if (opcion == "4") redLocal();
-            else if (opcion == "5") demostracion();
-            else std::cout << "Opcion invalida\n";
+            if (opcion == "1") demoInfraestructura();
+            else if (opcion == "2") demoNodos();
+            else if (opcion == "3") demoPolimorfismo();
+            else if (opcion == "4") demoConcurrencia();
+            else if (opcion == "5") demoRed();
+            else if (opcion == "6") demoCompleta();
+            else if (opcion == "7") lanzarProcesos();
+            else std::cout << "Opcion invalida" << std::endl;
         } catch (const std::exception& e) {
-            std::cerr << "Fallo controlado: " << e.what() << '\n';
+            std::cout << "Error controlado: " << e.what() << std::endl;
         }
     }
 }
-}
+
+}  // namespace
 
 int main(int argc, char* argv[]) {
     try {
-        if (argc == 1) {
-            menu();
-            return 0;
+        SistemaRed red;  // WSAStartup/WSACleanup en Windows
+        bool pausa = true;
+        std::string args[8];
+        int n = 0;
+        for (int i = 1; i < argc; ++i) {
+            const std::string a = argv[i];
+            if (a == "--sinpausa") pausa = false;
+            else {
+                if (n == 8) throw std::invalid_argument("Demasiados argumentos");
+                args[n++] = a;
+            }
         }
-        const std::string modo(argv[1]);
-        if (argc == 2 && modo == "--pruebas") {
-            demostracion();
-            return 0;
+        if (n == 0) return menu();
+        const std::string modo = args[0];
+        if (modo == "--pruebas") {
+            if (n != 1) throw std::invalid_argument("--pruebas no recibe argumentos posicionales");
+            return demoCompleta() ? 0 : 1;
         }
-        if (argc != 4) throw std::invalid_argument("Uso: --servidor|--router|--gateway|--sensor IPv4 puerto");
-        const std::string ip(argv[2]);
-        const auto puerto = puertoDe(argv[3]);
-        Registro registro;
         if (modo == "--servidor") {
-            ServidorCentral servidor;
-            servidor.atender(ip, puerto, 2, registro);
-        } else if (modo == "--router") {
-            RouterWiFi router("RTR-01", 12);
-            enviarEstado(ip, puerto, router, registro);
-        } else if (modo == "--gateway") {
-            GatewayLoRa gateway("GW-01", 868.1f);
-            enviarEstado(ip, puerto, gateway, registro);
-        } else if (modo == "--sensor") {
-            enviarTelemetria(ip, puerto, registro);
-        } else {
-            throw std::invalid_argument("Modo invalido");
+            if (n > 3) throw std::invalid_argument("Uso: --servidor [puerto] [segundos]");
+            const std::uint16_t puerto = n > 1 ? static_cast<std::uint16_t>(enteroDecimal(args[1], 1, 65535, "Puerto")) : 5000;
+            const int segundos = n > 2 ? enteroDecimal(args[2], 0, std::numeric_limits<int>::max(), "Segundos") : 0;
+            return modoServidor(puerto, segundos, pausa);
         }
-        return registro.errores ? 1 : 0;
-    } catch (const ExcepcionNodoRed& e) {
-        std::cerr << "Error de nodo o red: " << e.what() << '\n';
+        if (modo == "--router" || modo == "--gateway" || modo == "--sensor") {
+            if (n > 3) throw std::invalid_argument("Uso: --router|--gateway|--sensor [ip] [puerto]");
+            const std::string ip = n > 1 ? args[1] : "127.0.0.1";
+            const std::uint16_t puerto = n > 2 ? static_cast<std::uint16_t>(enteroDecimal(args[2], 1, 65535, "Puerto")) : 5000;
+            const int codigo = ejecutarRol(modo.substr(2), ip, puerto);
+            if (pausa) esperarEnter();
+            return codigo;
+        }
+        mostrarAyuda();
+        return 2;
     } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << '\n';
+        std::cerr << "Error fatal: " << e.what() << std::endl;
+        return 1;
     }
-    return 1;
 }

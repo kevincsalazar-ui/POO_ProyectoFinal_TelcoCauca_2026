@@ -1,37 +1,34 @@
 #ifndef ANTENA_H
 #define ANTENA_H
-#include "Tecnico.h"
-#include <cmath>
-#include <stdexcept>
+#include <string>
 
+class Tecnico;
+
+// Antena de una torre. Guarda un puntero NO propietario al tecnico responsable.
 class Antena {
     int idAntena;
     double frecuenciaMHz;
-    std::string tecnologia;
+    std::string tecnologia;  // "4G" o "5G"
     Tecnico* responsableMantenimiento;
+    friend class Tecnico;
+
 public:
-    Antena(int id, double frecuencia, const std::string& tipo, Tecnico* tecnico)
-        : idAntena(id), responsableMantenimiento(tecnico) {
-        setFrecuenciaMHz(frecuencia);
-        setTecnologia(tipo);
-    }
+    Antena(int id, double frecuencia, const std::string& tec, Tecnico* responsable = nullptr);
+    ~Antena();
+    Antena(const Antena&) = delete;
+    Antena& operator=(const Antena&) = delete;
+
     int getIdAntena() const { return idAntena; }
     double getFrecuenciaMHz() const { return frecuenciaMHz; }
     const std::string& getTecnologia() const { return tecnologia; }
-    Tecnico* getResponsableMantenimiento() const { return responsableMantenimiento; }
-    void setIdAntena(int id) { idAntena = id; }
-    void setFrecuenciaMHz(double f) {
-        if (!std::isfinite(f) || f <= 0) throw std::invalid_argument("Frecuencia invalida");
-        frecuenciaMHz = f;
-    }
-    void setTecnologia(const std::string& tipo) {
-        if (tipo != "4G" && tipo != "5G") throw std::invalid_argument("Tecnologia invalida");
-        tecnologia = tipo;
-    }
-    void setResponsableMantenimiento(Tecnico* t) { responsableMantenimiento = t; }
-    void mostrarInformacion() const {
-        std::cout << "Antena " << idAntena << " | " << tecnologia << " | " << frecuenciaMHz << " MHz\n";
-        if (responsableMantenimiento) responsableMantenimiento->mostrarInformacion();
-    }
+    const Tecnico* getResponsable() const { return responsableMantenimiento; }
+
+    void setFrecuenciaMHz(double frecuencia);
+    void setTecnologia(const std::string& tec);
+    // Asociacion 1:1: lanza std::invalid_argument si el tecnico ya atiende otra antena.
+    void setResponsable(Tecnico* tecnico);
+
+    void mostrarInformacion() const;
 };
+
 #endif

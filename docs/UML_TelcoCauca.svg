@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="1320" viewBox="0 0 1500 1320">
+<defs><marker id="tri" markerWidth="14" markerHeight="14" refX="12" refY="7" orient="auto"><path d="M1,1 L12,7 L1,13 Z" fill="white" stroke="#334155"/></marker><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M1,1 L9,5 L1,9" fill="none" stroke="#334155"/></marker></defs><rect width="1500" height="1320" fill="#f8fafc"/><style>text{font-family:Arial,sans-serif;fill:#15273d}.title{font-size:28px;font-weight:bold}.sub{font-size:17px}.head{font-size:18px;font-weight:bold}.body{font-size:15px}.edge{stroke:#334155;stroke-width:2;fill:none}</style>
+<text x="30" y="42" class="title">TelcoCauca | UML corregido</text>
+<text x="30" y="72" class="sub">Cinco módulos conservados · relaciones principales · 11 de noviembre de 2026</text>
+<rect x="25" y="95" width="465" height="410" rx="12" fill="white" stroke="#ccd6e2"/>
+<text x="43" y="125" class="head">1. Dominio: asociaciones no propietarias</text>
+<rect x="45" y="150" width="200" height="94" fill="#eff6ff" stroke="#426180"/>
+<text x="57" y="176" class="head">Tecnico</text>
+<path d="M45,186 H245" class="edge"/>
+<text x="57" y="210" class="body">id, nombre, especialidad</text>
+<text x="57" y="233" class="body">Antena* asignada</text>
+<rect x="270" y="150" width="200" height="94" fill="#eff6ff" stroke="#426180"/>
+<text x="282" y="176" class="head">Antena</text>
+<path d="M270,186 H470" class="edge"/>
+<text x="282" y="210" class="body">frecuencia, tecnología</text>
+<text x="282" y="233" class="body">Tecnico* responsable</text>
+<path d="M245,220 L270,220" class="edge"/>
+<text x="205" y="270" class="body">0..1 ↔ 0..1</text>
+<rect x="150" y="355" width="220" height="94" fill="#eff6ff" stroke="#426180"/>
+<text x="162" y="381" class="head">Torre</text>
+<path d="M150,391 H370" class="edge"/>
+<text x="162" y="415" class="body">vector&lt;Antena*&gt;</text>
+<text x="162" y="438" class="body">agregar / quitar</text>
+<path d="M260,355 L370,244" class="edge"/>
+<text x="310" y="313" class="body">0..N antenas</text>
+<text x="45" y="485" class="body">Torre no destruye antenas; deben seguir vivas.</text>
+<rect x="510" y="95" width="465" height="410" rx="12" fill="white" stroke="#ccd6e2"/>
+<text x="528" y="125" class="head">2. Herencia múltiple y excepciones</text>
+<rect x="530" y="150" width="210" height="94" fill="#eff6ff" stroke="#426180"/>
+<text x="542" y="176" class="head">DispositivoRed</text>
+<path d="M530,186 H740" class="edge"/>
+<text x="542" y="210" class="body">IP, MAC, estado</text>
+<text x="542" y="233" class="body">destructor virtual</text>
+<rect x="755" y="150" width="200" height="94" fill="#eff6ff" stroke="#426180"/>
+<text x="767" y="176" class="head">SensorIoT</text>
+<path d="M755,186 H955" class="edge"/>
+<text x="767" y="210" class="body">tipo, lectura</text>
+<text x="767" y="233" class="body">destructor virtual</text>
+<rect x="590" y="350" width="300" height="94" fill="#eff6ff" stroke="#426180"/>
+<text x="602" y="376" class="head">NodoRedInteligente</text>
+<path d="M590,386 H890" class="edge"/>
+<text x="602" y="410" class="body">carga de procesamiento</text>
+<text x="602" y="433" class="body">operator+ / friend operator&lt;&lt;</text>
+<path d="M650,350 L635,244" class="edge" marker-end="url(#tri)"/>
+<path d="M820,350 L855,244" class="edge" marker-end="url(#tri)"/>
+<text x="530" y="485" class="body">Excepciones propias → std::runtime_error</text>
+<rect x="995" y="95" width="480" height="410" rx="12" fill="white" stroke="#ccd6e2"/>
+<text x="1013" y="125" class="head">3. Interfaz y polimorfismo</text>
+<rect x="1030" y="145" width="410" height="94" fill="#eff6ff" stroke="#426180"/>
+<text x="1042" y="171" class="head">ITransmisible &lt;&lt;interface&gt;&gt;</text>
+<path d="M1030,181 H1440" class="edge"/>
+<text x="1042" y="205" class="body">serializar() const = 0</text>
+<text x="1042" y="228" class="body">~ITransmisible() = 0; definición inline</text>
+<rect x="1030" y="300" width="410" height="94" fill="#eff6ff" stroke="#426180"/>
+<text x="1042" y="326" class="head">DispositivoComunicacion</text>
+<path d="M1030,336 H1440" class="edge"/>
+<text x="1042" y="360" class="body">transmitir() = 0; serializar() override</text>
+<text x="1042" y="383" class="body">destructor virtual = default</text>
+<path d="M1235,300 L1235,239" class="edge" marker-end="url(#tri)"/>
+<text x="1015" y="440" class="body">RouterWiFi / GatewayLoRa / SwitchFibra</text>
+<path d="M1235,425 L1235,394" class="edge" marker-end="url(#tri)"/>
+<text x="1015" y="481" class="body">transmitir() override: simulación de trabajo</text>
+<rect x="25" y="530" width="620" height="410" rx="12" fill="white" stroke="#ccd6e2"/>
+<text x="43" y="560" class="head">4. Concurrencia y exclusión mutua</text>
+<rect x="50" y="590" width="260" height="94" fill="#eff6ff" stroke="#426180"/>
+<text x="62" y="616" class="head">GrupoHilos</text>
+<path d="M50,626 H310" class="edge"/>
+<text x="62" y="650" class="body">vector&lt;thread&gt;</text>
+<text x="62" y="673" class="body">agregar() / esperar(): join</text>
+<rect x="360" y="590" width="260" height="94" fill="#eff6ff" stroke="#426180"/>
+<text x="372" y="616" class="head">Supervisor</text>
+<path d="M360,626 H620" class="edge"/>
+<text x="372" y="650" class="body">supervisar(dispositivo, reg)</text>
+<text x="372" y="673" class="body">capturas dentro del hilo</text>
+<path d="M310,630 L360,630" class="edge" stroke-dasharray="6 5" marker-end="url(#arrow)"/>
+<text x="315" y="611" class="body">hilo</text>
+<rect x="195" y="790" width="340" height="94" fill="#eff6ff" stroke="#426180"/>
+<text x="207" y="816" class="head">Registro</text>
+<path d="M195,826 H535" class="edge"/>
+<text x="207" y="850" class="body">mutex, contadores, buffers</text>
+<text x="207" y="873" class="body">lock_guard en acceso y consola</text>
+<path d="M480,684 L405,790" class="edge" stroke-dasharray="6 5" marker-end="url(#arrow)"/>
+<text x="60" y="920" class="body">Eventos 2027: función libre en trabajador independiente.</text>
+<rect x="665" y="530" width="810" height="410" rx="12" fill="white" stroke="#ccd6e2"/>
+<text x="683" y="560" class="head">5. Red real: TCP/UDP y protocolo binario</text>
+<rect x="695" y="590" width="335" height="117" fill="#eff6ff" stroke="#426180"/>
+<text x="707" y="616" class="head">ServidorCentral</text>
+<path d="M695,626 H1030" class="edge"/>
+<text x="707" y="650" class="body">tcp, udp: Socket (propiedad)</text>
+<text x="707" y="673" class="body">hilos: aceptar, UDP y clientes</text>
+<text x="707" y="696" class="body">iniciar() / detener(): join</text>
+<rect x="1135" y="590" width="305" height="117" fill="#eff6ff" stroke="#426180"/>
+<text x="1147" y="616" class="head">Socket (RAII)</text>
+<path d="M1135,626 H1440" class="edge"/>
+<text x="1147" y="650" class="body">handle movible, no copiable</text>
+<text x="1147" y="673" class="body">conectar / enviar / recibir</text>
+<text x="1147" y="696" class="body">cierre en destructor</text>
+<path d="M1030,650 L1042,642 L1054,650 L1042,658 Z" fill="#334155"/>
+<path d="M1054,650 L1135,650" class="edge"/>
+<text x="1070" y="632" class="body">2</text>
+<rect x="695" y="790" width="335" height="94" fill="#eff6ff" stroke="#426180"/>
+<text x="707" y="816" class="head">Clientes &lt;&lt;funciones libres&gt;&gt;</text>
+<path d="M695,826 H1030" class="edge"/>
+<text x="707" y="850" class="body">clienteTcp() / clienteUdp()</text>
+<text x="707" y="873" class="body">ejecutarRol()</text>
+<rect x="1135" y="790" width="305" height="94" fill="#eff6ff" stroke="#426180"/>
+<text x="1147" y="816" class="head">Protocolo &lt;&lt;namespace&gt;&gt;</text>
+<path d="M1135,826 H1440" class="edge"/>
+<text x="1147" y="850" class="body">TramaWire 30 B / respuesta 7 B</text>
+<text x="1147" y="873" class="body">serializar / validar / CRC-16</text>
+<path d="M1020,790 L1170,707" class="edge" stroke-dasharray="6 5" marker-end="url(#arrow)"/>
+<path d="M1030,845 L1135,845" class="edge" stroke-dasharray="6 5" marker-end="url(#arrow)"/>
+<text x="695" y="921" class="body">Truncado UDP: descartar; IPv4 canónica; origen validado.</text>
+<rect x="25" y="965" width="1450" height="315" rx="12" fill="white" stroke="#ccd6e2"/>
+<text x="43" y="995" class="head">Lectura del diagrama y límites</text>
+<text x="45" y="1030" class="body">Triángulo vacío hacia la base = herencia; línea discontinua = dependencia; rombo negro junto al dueño = composición.</text>
+<text x="45" y="1062" class="body">ServidorCentral posee los objetos Socket tcp/udp. Cada conexión aceptada se mueve al trabajador, con cierre RAII.</text>
+<text x="45" y="1094" class="body">Clientes es una agrupación documental de funciones globales: no existe una clase Clientes ni un namespace Clientes.</text>
+<text x="45" y="1126" class="body">Técnico/Antena permiten no tener asignación. Una antena puede figurar en varias torres: el código no exige exclusividad global.</text>
+<text x="45" y="1158" class="body">El diagrama omite getters y detalles secundarios; el PNG recibido se conserva en Referencias_originales.</text>
+<text x="45" y="1190" class="body">Los IDs H1/H2 no fijan roles. Un mutex no prueba ausencia universal de deadlocks; CRC no autentica ni cifra.</text>
+<text x="45" y="1222" class="body">Corrección estática: regresión funcional, enlace GCC 7.2, ZinjaI y resolución de Defender pendientes.</text>
+</svg>

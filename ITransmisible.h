@@ -1,10 +1,17 @@
 #ifndef ITRANSMISIBLE_H
 #define ITRANSMISIBLE_H
-#include <string>
+#include <cstdint>
+#include <vector>
 
+// Interfaz pura: solo metodos virtuales puros y ningun atributo.
+// Contrato: todo objeto transmisible sabe convertirse en bytes para la red.
 class ITransmisible {
 public:
-    virtual ~ITransmisible() = default;
-    virtual std::string serializar() const = 0;
+    virtual ~ITransmisible() = 0;  // puro para cumplir literalmente la interfaz sin metodos concretos
+    virtual std::vector<std::uint8_t> serializar() const = 0;
 };
+
+// Incluso un destructor virtual puro necesita definicion: se ejecuta al destruir derivados.
+inline ITransmisible::~ITransmisible() = default;
+
 #endif
