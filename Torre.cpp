@@ -1,5 +1,5 @@
 #include "Torre.h"
-#include "Antena.h"  // aqui si se necesita la definicion completa
+#include "Antena.h"  
 #include "Tecnico.h"
 #include <algorithm>
 #include <iostream>
