@@ -6,7 +6,7 @@ void Supervisor::supervisar(DispositivoComunicacion* dispositivo, Registro& regi
     try {
         if (dispositivo == nullptr) throw std::invalid_argument("Puntero nulo detectado: no se transmite");
         registro.imprimir("Inicia " + dispositivo->getId() + " (" + dispositivo->getTipo() + ")");
-        dispositivo->transmitir();  // trabajo lento FUERA de la seccion critica
+        dispositivo->transmitir();  
         registro.registrarExito("Transmision de " + dispositivo->getId() + " (" + dispositivo->getTipo() + ")");
     } catch (const ExcepcionNodoRed& e) {
         registro.registrarError(std::string("ExcepcionNodoRed: ") + e.what());
