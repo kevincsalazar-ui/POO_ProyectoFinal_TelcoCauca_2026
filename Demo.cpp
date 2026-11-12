@@ -54,7 +54,7 @@ bool esperarHasta(Condicion condicion, int maxMs) {
     return condicion();
 }
 
-}  // namespace
+}  
 
 // ---------------------------------------------------------------- Modulo 1
 bool demoInfraestructura() {
