@@ -1,7 +1,5 @@
 #ifndef PLATAFORMARED_H
 #define PLATAFORMARED_H
-// Cabeceras y tipos de plataforma; Socket.cpp y main.cpp tambien contienen ramas especificas.
-// En Windows (ZinjaI/MinGW) usa Winsock2 y enlaza ws2_32.
 #ifdef _WIN32
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
