@@ -13,14 +13,14 @@ bool DispositivoRed::ipValida(const std::string& ip) {
             if (valor > 255) return false;
             ++i;
         }
-        if (i == inicio || i - inicio > 3) return false;  // parte vacia o demasiado larga
+        if (i == inicio || i - inicio > 3) return false;
         // Formato decimal canonico: evita que inet_addr interprete octetos como octal.
         if (i - inicio > 1 && ip[inicio] == '0') return false;
         ++partes;
         if (i == ip.size()) break;
         if (ip[i] != '.') return false;
         ++i;
-        if (i == ip.size()) return false;  // termina en punto
+        if (i == ip.size()) return false;
     }
     return partes == 4;
 }
@@ -45,7 +45,7 @@ DispositivoRed::DispositivoRed(const std::string& ip, const std::string& mac, bo
 
 void DispositivoRed::setDireccionIP(const std::string& ip) {
     if (!ipValida(ip)) throw ExcepcionNodoRed("Direccion IPv4 invalida: " + ip);
-    direccionIP = ip;  // se asigna solo despues de validar
+    direccionIP = ip;
 }
 
 void DispositivoRed::setDireccionMAC(const std::string& mac) {
