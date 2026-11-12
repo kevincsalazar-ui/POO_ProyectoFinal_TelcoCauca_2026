@@ -68,7 +68,7 @@ Protocolo::CodigoRespuesta ServidorCentral::procesar(const std::uint8_t* datos, 
                                                      std::uint32_t& secuencia) {
     secuencia = Protocolo::secuenciaDe(datos, n);
     try {
-        const Protocolo::Trama trama = Protocolo::deserializar(datos, n);  // valida todo
+        const Protocolo::Trama trama = Protocolo::deserializar(datos, n);
         registro.agregarTrama(std::string(canal) + " " + Protocolo::describir(trama));
         return Protocolo::ACK;
     } catch (const ExcepcionNodoRed& e) {
