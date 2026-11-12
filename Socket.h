@@ -5,7 +5,6 @@
 #include <cstdint>
 #include <string>
 
-// RAII de Winsock: WSAStartup al crearse, WSACleanup al destruirse (no hace nada en Linux).
 class SistemaRed {
 public:
     SistemaRed();
