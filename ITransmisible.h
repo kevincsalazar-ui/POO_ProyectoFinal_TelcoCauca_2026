@@ -7,7 +7,7 @@
 // Contrato: todo objeto transmisible sabe convertirse en bytes para la red.
 class ITransmisible {
 public:
-    virtual ~ITransmisible() = 0;  // puro para cumplir literalmente la interfaz sin metodos concretos
+    virtual ~ITransmisible() = 0;
     virtual std::vector<std::uint8_t> serializar() const = 0;
 };
 
