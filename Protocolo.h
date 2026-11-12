@@ -59,7 +59,7 @@ Trama crearTemperatura(const std::string& origen, const std::string& ip, std::ui
 // validar=false SOLO sirve para pruebas de inyeccion de fallos.
 std::vector<std::uint8_t> serializar(const Trama& trama, bool validar = true);
 
-// Convierte bytes recibidos en Trama. Lanza ExcepcionNodoRed si el tamano, la firma, la version,
+// Convierte bytes recibidos en Trama. Lanza ExcepcionNodoRed si el tamaño, la firma, la version,
 // el CRC o los valores no son correctos. NUNCA confia en los datos de la red.
 Trama deserializar(const std::uint8_t* datos, std::size_t n);
 
@@ -72,6 +72,6 @@ std::uint32_t secuenciaDe(const std::uint8_t* datos, std::size_t n);
 std::uint16_t crc16(const std::uint8_t* datos, std::size_t n);
 std::string describir(const Trama& trama);
 
-}  // namespace Protocolo
+}
 
 #endif
