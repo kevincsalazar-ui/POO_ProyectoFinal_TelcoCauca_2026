@@ -27,7 +27,7 @@ class DispositivoComunicacion : public ITransmisible {
 
 public:
     DispositivoComunicacion(const std::string& codigo, const std::string& nombreTipo, const std::string& direccion);
-    virtual ~DispositivoComunicacion() = default;  // OBLIGATORIO: se destruye a traves de la base
+    virtual ~DispositivoComunicacion() = default;
     DispositivoComunicacion(const DispositivoComunicacion&) = delete;
     DispositivoComunicacion& operator=(const DispositivoComunicacion&) = delete;
 
