@@ -15,7 +15,6 @@ public:
     double getCargaProcesamiento() const { return cargaProcesamiento; }
     void setCargaProcesamiento(double carga);
 
-    // Suma las cargas de procesamiento de dos nodos.
     double operator+(const NodoRedInteligente& otro) const;
 
     // Funcion amiga: necesita leer cargaProcesamiento (privado) y devuelve el flujo para encadenar.
