@@ -51,9 +51,8 @@ std::string textoIp(const sockaddr_in& a) {
            aTexto(static_cast<int>(b[2])) + "." + aTexto(static_cast<int>(b[3]));
 }
 
-}  // namespace
+}
 
-// ---------------- SistemaRed ----------------
 SistemaRed::SistemaRed() {
 #ifdef _WIN32
     WSADATA datos;
@@ -67,7 +66,6 @@ SistemaRed::~SistemaRed() {
 #endif
 }
 
-// ---------------- Socket ----------------
 bool Socket::valido() const { return handle != invalido(); }
 
 Socket::Socket() : handle(invalido()), tipo(TipoSocket::TCP) {}
@@ -134,9 +132,7 @@ void Socket::fijarTimeout(int ms) {
 
 void Socket::enlazar(const std::string& ip, std::uint16_t puerto) {
 #ifndef _WIN32
-    // En Linux evita fallos por TIME_WAIT al reiniciar. En Windows NO se usa: alli SO_REUSEADDR
-    // permitiria que dos programas compartan el puerto y ocultaria el error de "puerto ocupado".
-    // Solo para TCP: en UDP permitiria que dos sockets compartan el puerto.
+  
     if (tipo == TipoSocket::TCP) {
         int uno = 1;
         if (setsockopt(handle, SOL_SOCKET, SO_REUSEADDR, &uno, sizeof(uno)) != 0)
@@ -288,7 +284,7 @@ EstadoRecepcion Socket::recibirDe(std::uint8_t* datos, std::size_t max, std::siz
     if (r < 0) {
         const int codigo = codigoError();
 #ifdef _WIN32
-        // Winsock ya consumio el datagrama; no reintentar ni interpretar su prefijo.
+        
         if (codigo == WSAEMSGSIZE) return EstadoRecepcion::DESCARTADO;
 #endif
         if (esTimeout(codigo) || esReinicioUdp(codigo)) return EstadoRecepcion::TIMEOUT;
