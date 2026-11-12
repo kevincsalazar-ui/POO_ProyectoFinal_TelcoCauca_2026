@@ -30,7 +30,7 @@ Protocolo::CodigoRespuesta contar(const std::uint8_t* datos, std::size_t n, std:
     return codigo;
 }
 
-}  // namespace
+}  
 
 ResultadoCliente clienteTcp(const std::string& ip, std::uint16_t puerto, const std::vector<Protocolo::Trama>& tramas,
                             Registro& registro, int pausaMs, int timeoutMs) {
