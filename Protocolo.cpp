@@ -1,7 +1,7 @@
 #include "Protocolo.h"
 #include "DispositivoRed.h"
 #include "Excepciones.h"
-#include "PlataformaRed.h"  // htonl, htons, ntohl, ntohs
+#include "PlataformaRed.h"  
 #include "SensorIoT.h"
 #include "Util.h"
 #include <cmath>
@@ -42,10 +42,10 @@ void validar(const Trama& t) {
     if (!DispositivoRed::ipValida(t.ip)) throw ExcepcionNodoRed("Direccion IPv4 invalida en la trama: " + t.ip);
     if (!std::isfinite(t.valor)) throw ExcepcionNodoRed("Valor no finito en la trama");
     if (t.tipo == ESTADO && t.valor != 0.0 && t.valor != 1.0) throw ExcepcionNodoRed("El estado debe ser 0 o 1");
-    if (t.tipo == TEMPERATURA) SensorIoT::validarLectura(t.valor);  // misma regla que el sensor
+    if (t.tipo == TEMPERATURA) SensorIoT::validarLectura(t.valor);
 }
 
-}  // namespace
+}
 
 std::uint16_t crc16(const std::uint8_t* datos, std::size_t n) {
     std::uint16_t crc = 0xFFFF;
@@ -70,7 +70,7 @@ Trama crearTemperatura(const std::string& origen, const std::string& ip, std::ui
 std::vector<std::uint8_t> serializar(const Trama& trama, bool validarDatos) {
     if (validarDatos) validar(trama);
     TramaWire w;
-    std::memset(&w, 0, sizeof(w));  // deja en cero cualquier byte no escrito
+    std::memset(&w, 0, sizeof(w));
     w.magic[0] = 'T';
     w.magic[1] = 'C';
     w.version = VERSION;
@@ -146,4 +146,4 @@ std::string describir(const Trama& t) {
     return s.str();
 }
 
-}  // namespace Protocolo
+}
