@@ -1,6 +1,5 @@
 #ifndef UTIL_H
 #define UTIL_H
-// Utilidades minimas. aTexto evita std::to_string (problemas en algunos MinGW antiguos).
 #include <sstream>
 #include <string>
 #include <stdexcept>
