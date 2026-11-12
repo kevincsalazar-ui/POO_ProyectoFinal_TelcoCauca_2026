@@ -1,5 +1,3 @@
-// TelcoCauca - Sistema distribuido concurrente de monitoreo de infraestructura de telecomunicaciones e IoT.
-// Universidad del Cauca - Programacion Orientada a Objetos - C++11.
 #include "Clientes.h"
 #include "Demo.h"
 #include "Registro.h"
@@ -55,7 +53,6 @@ int modoServidor(std::uint16_t puerto, int segundos, bool pausa) {
     return registro.errores() == 0 ? 0 : 1;
 }
 
-// Opcion 7: abre servidor y tres clientes en consolas separadas (solo Windows).
 void lanzarProcesos() {
 #ifdef _WIN32
     char ruta[MAX_PATH];
@@ -118,11 +115,11 @@ int menu() {
     }
 }
 
-}  // namespace
+}
 
 int main(int argc, char* argv[]) {
     try {
-        SistemaRed red;  // WSAStartup/WSACleanup en Windows
+        SistemaRed red;
         bool pausa = true;
         std::string args[8];
         int n = 0;
