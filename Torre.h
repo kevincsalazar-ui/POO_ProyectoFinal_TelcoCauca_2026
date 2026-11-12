@@ -7,7 +7,7 @@
 class Antena;  // declaracion adelantada: basta para declarar punteros Antena*
 
 // Torre con N antenas (asociacion 1:N, agregacion).
-// Propiedad: la Torre NO es duena de las antenas. Quien crea la antena la destruye;
+// Propiedad: la Torre NO es dueña de las antenas. Quien crea la antena la destruye;
 // debe vivir mientras la torre la use (en la demo se declaran antes que la torre).
 class Torre {
     int idTorre;
